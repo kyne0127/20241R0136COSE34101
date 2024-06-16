@@ -15,7 +15,7 @@ void npps_calculate(Process *p, int len)
     // 모든 process가 완료되었는지 확인할 변수 선언
     int min = -1;
     // 우선순위가 가장 높은 인덱스를 저장할 변수 선언
-    int time = 0;
+    int curr_time = 0;
     // 현재 시간을 저장할 변수 선언 및 초기화
 
     // process의 초기 상태를 명확히 설정
@@ -23,8 +23,6 @@ void npps_calculate(Process *p, int len)
         p[i].completed = FALSE;
         p[i].waiting_time = 0;
         p[i].turnaround_time = 0;
-        p[i].response_time = 0;
-        p[i].return_time = 0;
     }
 
     /* 모든 process가 완료될때 까지 반복 */
@@ -40,10 +38,17 @@ void npps_calculate(Process *p, int len)
                아직 실행되지 않았고 이미 도착한 process인 경우 */
             if ((p[i].priority < (min == -1 ? INT_MAX : p[min].priority))
                 && (p[i].completed == FALSE)
-                && (p[i].arrive_time <= time))
+                && (p[i].arrive_time <= curr_time))
             {
                 min = i;
                 check = TRUE;
+            }
+
+                // I/O burst time을 처리
+            if (curr_time >= p[i].io_start_time && curr_time < p[i].io_start_time + p[i].io_duration)
+            {
+                curr_time += (p[i].io_start_time + p[i].io_duration - curr_time);
+                // printf("process: %s current time: %d\n", p[i].id, curr_time);
             }
         }
 
@@ -52,37 +57,73 @@ void npps_calculate(Process *p, int len)
             break;
 
         /* 선택된 process 시간 계산 */
-        p[min].response_time = time - p[min].arrive_time;
-        p[min].return_time = time + p[min].burst;
-        p[min].turnaround_time = p[min].return_time - p[min].arrive_time;
-        p[min].waiting_time = p[min].response_time;
+        p[min].waiting_time = curr_time - p[min].arrive_time;
+        p[min].turnaround_time = p[min].waiting_time + p[min].burst;
         p[min].completed = TRUE;
 
-        time += p[min].burst;
+        curr_time += p[min].burst;
         // 실행된 process 시간 만큼 현재 시간 증가
+        p[min].end_time = curr_time;
     }
 }
 
 void npps_print_gantt_chart(Process *p, int len)
 {
-    int i, j;
+	int i, j, curr_time = 0;
+	// 반복문에서 사용할 변수 선언
 
-    printf("\t ");
+	printf("\t ");
 
-    /* 상단 바 출력 */
-    for (i = 0; i < len; i++)
-    {
+	/* 상단 바 출력 */
+	for (i = 0; i < len; i++)
+	{
+		// Idle time을 처리
+        if (curr_time < p[i].arrive_time)
+        {
+            for (j = curr_time; j < p[i].arrive_time; j++)
+                printf("xx");
+            curr_time = p[i].arrive_time;
+        }
+
+        // I/O burst time을 처리
+        if (curr_time >= p[i].io_start_time && curr_time < p[i].io_start_time + p[i].io_duration)
+        {
+            for (j = curr_time; j < p[i].io_start_time + p[i].io_duration; j++)
+                printf("xx");
+            curr_time += (p[i].io_start_time + p[i].io_duration - curr_time);
+        }
+
+        // 실제 작업 시간 출력
         for (j = 0; j < p[i].burst; j++)
             printf("--");
 
+        curr_time += p[i].burst;
         printf(" ");
-    }
+	}
 
-    printf("\n\t|");
+	printf("\n\t|");
 
-    /* process ID 출력 */
+	// process 이름 출력
+    curr_time = 0;
     for (i = 0; i < len; i++)
     {
+        // Idle time을 처리
+        if (curr_time < p[i].arrive_time)
+        {
+            for (j = curr_time; j < p[i].arrive_time; j++)
+                printf("  ");
+            curr_time = p[i].arrive_time;
+        }
+
+        // I/O burst time을 처리
+        if (curr_time >= p[i].io_start_time && curr_time < p[i].io_start_time + p[i].io_duration)
+        {
+            for (j = curr_time; j < p[i].io_start_time + p[i].io_duration; j++)
+                printf("  ");
+            curr_time = p[i].io_start_time + p[i].io_duration;
+        }
+
+        // 실제 작업 시간 출력
         for (j = 0; j < p[i].burst - 1; j++)
             printf(" ");
 
@@ -91,34 +132,72 @@ void npps_print_gantt_chart(Process *p, int len)
         for (j = 0; j < p[i].burst - 1; j++)
             printf(" ");
 
+        curr_time += p[i].burst;
         printf("|");
     }
 
     printf("\n\t ");
 
-    /* 하단 바 출력 */
+    // 하단 바 출력
+    curr_time = 0;
     for (i = 0; i < len; i++)
     {
+        // Idle time을 처리
+        if (curr_time < p[i].arrive_time)
+        {
+            for (j = curr_time; j < p[i].arrive_time; j++)
+                printf("xx");
+            curr_time = p[i].arrive_time;
+        }
+
+        // I/O burst time을 처리
+        if (curr_time >= p[i].io_start_time && curr_time < p[i].io_start_time + p[i].io_duration)
+        {
+            for (j = curr_time; j < p[i].io_start_time + p[i].io_duration; j++)
+                printf("xx");
+            curr_time += (p[i].io_start_time + p[i].io_duration - curr_time);
+        }
+
+        // 실제 작업 시간 출력
         for (j = 0; j < p[i].burst; j++)
             printf("--");
 
+        curr_time += p[i].burst;
         printf(" ");
     }
 
     printf("\n\t");
 
-    /* process 시간 출력 */
+    // process 시간 출력
+    curr_time = 0;
     printf("0");
-
     for (i = 0; i < len; i++)
     {
+        // Idle time을 처리
+        if (curr_time < p[i].arrive_time)
+        {
+            for (j = curr_time; j < p[i].arrive_time; j++)
+                printf("  ");
+            curr_time = p[i].arrive_time;
+        }
+
+        // I/O burst time을 처리
+        if (curr_time >= p[i].io_start_time && curr_time < p[i].io_start_time + p[i].io_duration)
+        {
+            for (j = curr_time; j < p[i].io_start_time + p[i].io_duration; j++)
+                printf("  ");
+            curr_time = p[i].io_start_time + p[i].io_duration;
+        }
+
+        // 실제 작업 시간 출력
         for (j = 0; j < p[i].burst; j++)
             printf("  ");
 
-        if (p[i].return_time > 9)
+        if (curr_time + p[i].burst > 9)
             printf("\b");
 
-        printf("%d", p[i].return_time);
+        curr_time += p[i].burst;
+        printf("%d", curr_time);
     }
 
     printf("\n");
@@ -129,7 +208,6 @@ void NPPS(Process *p, int len)
     int i;
     int total_waiting_time = 0;
     int total_turnaround_time = 0;
-    int total_response_time = 0;
 
     process_init(p, len);
     // process_init 함수 호출로 process 초기화
@@ -145,21 +223,19 @@ void NPPS(Process *p, int len)
     {
         total_waiting_time += p[i].waiting_time;
         total_turnaround_time += p[i].turnaround_time;
-        total_response_time += p[i].response_time;
     }
 
-    quick_sort_by_return_time(p, len);
-    // quick_sort_by_return_time 함수 호출로 반환 시간으로 정렬
+    quick_sort_by_end_time(p, len);
+    // quick_sort_by_end_time 함수 호출로 반환 시간으로 정렬
 
     printf("\tNon-preemptive Priority Scheduling Algorithm\n\n");
 
     npps_print_gantt_chart(p, len);
     // npps_print_gantt_chart 함수 호출로 간트 차트 출력
 
-    /* 평균 대기시간, 턴어라운드 타임, 응답 시간 출력 */
+    /* 평균 대기시간, 턴어라운드 타임 출력 */
     printf("\n\tAverage Waiting Time     : %-2.2lf\n", (double)total_waiting_time / (double)len);
     printf("\tAverage Turnaround Time  : %-2.2lf\n", (double)total_turnaround_time / (double)len);
-    printf("\tAverage Response Time    : %-2.2lf\n\n", (double)total_response_time / (double)len);
 
     print_table(p, len);
     // print_table 함수 호출로 데이터 표 출력
@@ -172,7 +248,6 @@ void NPPS(Process *p, int len)
     fprintf(file, "Algorithm: Non-preemptive Priority Scheduling\n");
     fprintf(file, "Average Waiting Time: %.2f\n", (double)total_waiting_time / (double)len);
     fprintf(file, "Average Turnaround Time: %.2f\n", (double)total_turnaround_time / (double)len);
-    fprintf(file, "Average Response Time: %.2f\n", (double)total_response_time / (double)len);
     fprintf(file, "--------------------------\n");
 
     fclose(file);

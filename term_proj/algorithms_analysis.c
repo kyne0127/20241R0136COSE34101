@@ -9,7 +9,6 @@ typedef struct {
     char name[50];
     double avg_waiting_time;
     double avg_turnaround_time;
-    double avg_response_time;
 } AlgorithmResult;
 
 void analyze_results(const char *filename);
@@ -44,10 +43,6 @@ void analyze_results(const char *filename) {
                 sscanf(line, "Average Turnaround Time: %lf", &results[count].avg_turnaround_time);
             }
 
-            if (fgets(line, sizeof(line), file)) {
-                sscanf(line, "Average Response Time: %lf", &results[count].avg_response_time);
-            }
-
             // Skip the separator line
             fgets(line, sizeof(line), file);
 
@@ -64,7 +59,6 @@ void analyze_results(const char *filename) {
 
     int best_waiting_index = 0;
     int best_turnaround_index = 0;
-    int best_response_index = 0;
 
     for (int i = 1; i < count; i++) {
         if (results[i].avg_waiting_time < results[best_waiting_index].avg_waiting_time) {
@@ -72,9 +66,6 @@ void analyze_results(const char *filename) {
         }
         if (results[i].avg_turnaround_time < results[best_turnaround_index].avg_turnaround_time) {
             best_turnaround_index = i;
-        }
-        if (results[i].avg_response_time < results[best_response_index].avg_response_time) {
-            best_response_index = i;
         }
     }
     // Print all results
@@ -89,21 +80,16 @@ void analyze_results(const char *filename) {
     printf("Algorithm: %s\n", results[best_turnaround_index].name);
     printf("Average Turnaround Time: %.2f\n", results[best_turnaround_index].avg_turnaround_time);
     printf("--------------------------\n");
-
-    printf("Best Algorithm by Average Response Time:\n");
-    printf("Algorithm: %s\n", results[best_response_index].name);
-    printf("Average Response Time: %.2f\n", results[best_response_index].avg_response_time);
-    printf("--------------------------\n");
 }
 
 void print_all_results(AlgorithmResult results[], int count) {
     printf("\nAll Algorithm Results:\n");
-    printf("+-------------------------------------+-----------------------+---------------------------+-----------------------+\n");
-    printf("|            Algorithm                | Average Waiting Time  | Average Turnaround Time   | Average Response Time |\n");
-    printf("+-------------------------------------+-----------------------+---------------------------+-----------------------+\n");
+    printf("+-------------------------------------+-----------------------+---------------------------+\n");
+    printf("|            Algorithm                | Average Waiting Time  | Average Turnaround Time   |\n");
+    printf("+-------------------------------------+-----------------------+---------------------------+\n");
     for (int i = 0; i < count; i++) {
-        printf("| %-35s | %21.2f | %25.2f | %21.2f |\n",
-               results[i].name, results[i].avg_waiting_time, results[i].avg_turnaround_time, results[i].avg_response_time);
-        printf("+-------------------------------------+-----------------------+---------------------------+-----------------------+\n");
+        printf("| %-35s | %21.2f | %25.2f |\n",
+               results[i].name, results[i].avg_waiting_time, results[i].avg_turnaround_time);
+        printf("+-------------------------------------+-----------------------+---------------------------+\n");
     }
 }

@@ -12,14 +12,13 @@ int main()
 
     int i = 0;
 
-    int process_generator = system("./process_generator");
-    //process_generator를 실행하여 프로세스 생성
+    // int process_generator = system("./process_generator");
+    // //process_generator를 실행하여 프로세스 생성
 
-    if (process_generator == -1) {
-        perror("system");
-        return 1;
-    }
-
+    // if (process_generator == -1) {
+    //     perror("system");
+    //     return 1;
+    // }
 
     Quantum quantum;
     // 시간 할당량
@@ -43,8 +42,8 @@ int main()
     /* process의 갯수만큼 반복 */
     while (i < process_count)
     {
-        fscanf(fp, "%s %d %d %d",
-                process[i].id, &process[i].arrive_time, &process[i].burst, &process[i].priority);
+        fscanf(fp, "%s %d %d %d %d %d",
+                process[i].id, &process[i].arrive_time, &process[i].burst, &process[i].priority, &process[i].io_start_time, &process[i].io_duration);
         i++;
     }
 

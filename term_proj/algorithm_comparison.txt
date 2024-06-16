@@ -1,30 +1,24 @@
 Algorithm: FCFS
-Average Waiting Time: 10.33
-Average Turnaround Time: 15.50
-Average Response Time: 10.33
+Average Waiting Time: 11.00
+Average Turnaround Time: 14.33
 --------------------------
 Algorithm: Non-Preemptive SJF
-Average Waiting Time: 7.83
-Average Turnaround Time: 13.00
-Average Response Time: 7.83
+Average Waiting Time: 6.50
+Average Turnaround Time: 9.83
 --------------------------
 Algorithm: Preemptive SJF
-Average Waiting Time: 7.17
-Average Turnaround Time: 12.33
-Average Response Time: 10.67
+Average Waiting Time: 5.67
+Average Turnaround Time: 9.00
 --------------------------
 Algorithm: Non-preemptive Priority Scheduling
-Average Waiting Time: 9.67
-Average Turnaround Time: 14.83
-Average Response Time: 9.67
+Average Waiting Time: 8.17
+Average Turnaround Time: 11.50
 --------------------------
 Algorithm: Preemptive Priority
-Average Waiting Time: 10.67
-Average Turnaround Time: 15.83
-Average Response Time: 12.67
+Average Waiting Time: 6.33
+Average Turnaround Time: 9.67
 --------------------------
 Algorithm: Round Robin
-Average Waiting Time: 15.00
-Average Turnaround Time: 20.17
-Average Response Time: 0.83
+Average Waiting Time: 8.67
+Average Turnaround Time: 12.00
 --------------------------
