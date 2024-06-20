@@ -30,7 +30,7 @@ void generateRandomProcesses(Process p[], int n) {
         if (min_io_start_time >= p[i].arrival_time + p[i].burst_time) {
             p[i].io_start_time = min_io_start_time;
         } else {
-            p[i].io_start_time = min_io_start_time + rand() % (p[i].burst_time - min_io_start_time);
+            p[i].io_start_time = min_io_start_time + rand() % (p[i].burst_time - min_io_start_time) + 10;
         }
         
         p[i].io_duration = rand() % 3 + 1;  // Random I/O duration between 1 and 3

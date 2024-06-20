@@ -1,15 +1,13 @@
 #ifndef __SHORTEST__REMAINING__TIME
 #define __SHORTEST__REMAINING__TIME
 
-// Preemptive Shortest Job First Algorithm
-
 #include "./Process.h"
 #include "./SortingFunction.h"
-#include "./PrintTable.h"
-#include "./PrintGanttChart_preemptive_sjf.h"
+#include "./PrintFunction/PrintTable.h"
+#include "./PrintFunction/PrintGanttChart_preemptive_sjf.h"
 #include <limits.h>
 
-void psjf_calculate_time(Process *p, int len)
+void psjf_calculate_time(Process *p, int len, int *idle)
 {
     int i;
     int curr_time = 0;
@@ -21,7 +19,7 @@ void psjf_calculate_time(Process *p, int len)
     int *count = (int *)malloc(sizeof(int) * len);
 
     int flag = 1;
-    int idle = 0;
+    *idle = 0;
 
     for (i = 0; i < len; i++)
     {
@@ -53,28 +51,14 @@ void psjf_calculate_time(Process *p, int len)
             {
                 shortest_remain_time = remain_burst_time[i];
                 k = i;
-                idle += 1;
             }
         }
 
         if (k == -1)
         {
-            if (idle == 0) {
-                // printf("Currently CPU is in Idle State. curr_time : %d\n", curr_time);
-            }
             curr_time++;
+            *idle += 1;
             continue;
-        }
-        else {
-            if (idle == 0) {
-                // printf("Currently CPU is in Idle State. curr_time : %d\n", curr_time);
-            }
-        }
-        idle = 0; // Reset idle when a process is selected
-
-        if (count[k] == 0)
-        {
-            count[k]++;
         }
 
         remain_burst_time[k]--;
@@ -86,7 +70,6 @@ void psjf_calculate_time(Process *p, int len)
             p[k].waiting_time = curr_time - p[k].burst - p[k].arrive_time;
         }
 
-        // Check if all processes are completed
         flag = 0;
         for (i = 0; i < len; i++)
         {
@@ -101,8 +84,8 @@ void psjf_calculate_time(Process *p, int len)
     free(remain_burst_time);
 }
 
-
-void psjf_print_gantt_chart(Process *p, int len) {
+void psjf_print_gantt_chart(Process *p, int len)
+{
     print_gantt_chart_psjf(p, len);
 }
 
@@ -111,11 +94,14 @@ void PSJF(Process *p, int len)
     int i;
     int total_waiting_time = 0;
     int total_turnaround_time = 0;
+    double cpu_utilization = 0;
+
+    int idle = 0;
 
     process_init(p, len);
 
     merge_sort_by_arrive_time(p, 0, len);
-    psjf_calculate_time(p, len);
+    psjf_calculate_time(p, len, &idle);
 
     for (i = 0; i < len; i++)
     {
@@ -128,9 +114,14 @@ void PSJF(Process *p, int len)
     printf("\tPreemptive Shortest Job First Algorithm\n\n");
 
     psjf_print_gantt_chart(p, len);
+    printf("idle tie : %d", idle);
+
+    quick_sort_by_end_time(p, len);
 
     printf("\n\tAverage Waiting Time     : %-2.2lf\n", (double)total_waiting_time / (double)len);
-    printf("\tAverage Turnaround Time  : %-2.2lf\n\n", (double)total_turnaround_time / (double)len);
+    printf("\tAverage Turnaround Time  : %-2.2lf\n", (double)total_turnaround_time / (double)len);
+    cpu_utilization = ((double)(p[len-1].end_time - idle) / (double)p[len-1].end_time) * 100.0;
+    printf("\tCPU Utilization rate     : %-2.2lf%%\n", cpu_utilization);
 
     print_table(p, len);
     FILE *file = fopen("algorithm_comparison.txt", "a");
@@ -143,6 +134,7 @@ void PSJF(Process *p, int len)
     fprintf(file, "Algorithm: Preemptive SJF\n");
     fprintf(file, "Average Waiting Time: %.2f\n", (double)total_waiting_time / (double)len);
     fprintf(file, "Average Turnaround Time: %.2f\n", (double)total_turnaround_time / (double)len);
+    fprintf(file, "CPU Utilization rate: %.2f%%\n", cpu_utilization);
     fprintf(file, "--------------------------\n");
 
     fclose(file);

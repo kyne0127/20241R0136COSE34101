@@ -5,8 +5,8 @@
 
 #include "./Process.h"
 #include "./SortingFunction.h"
-#include "./PrintTable.h"
-#include "./PrintGanttChart_RR.h"
+#include "./PrintFunction/PrintTable.h"
+#include "./PrintFunction/PrintGanttChart_RR.h"
 
 void rr_calculate_waiting_time(Process *p, int len, Quantum q)
 {
@@ -17,7 +17,6 @@ void rr_calculate_waiting_time(Process *p, int len, Quantum q)
     int double_checker = 0;
 
     int *remain_burst_time = (int *)malloc(sizeof(int) * len);
-    int *remain_process = (int *)malloc(sizeof(char) *len);
 
 
     for (i = 0; i < len; i++)
@@ -25,7 +24,6 @@ void rr_calculate_waiting_time(Process *p, int len, Quantum q)
         remain_burst_time[i] = p[i].burst;
         p[i].waiting_time = 0;
         p[i].available = TRUE;
-        remain_process[i] = 1;
     }
 
     while (flag)
@@ -56,7 +54,7 @@ void rr_calculate_waiting_time(Process *p, int len, Quantum q)
                         p[i].waiting_time += (curr_time - p[i].burst - p[i].arrive_time);
                         remain_burst_time[i] = 0;
                         p[i].completed = TRUE;
-                        // printf("curr time : %d, end up %s\n", curr_time, p[i].id);
+                        printf("curr time : %d, end up %s\n", curr_time, p[i].id);
                     }
             }
 
@@ -150,3 +148,4 @@ void RR(Process *p, int len, Quantum quantum)
 }
 
 #endif
+

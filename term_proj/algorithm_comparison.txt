@@ -9,10 +9,11 @@ Average Turnaround Time: 9.83
 Algorithm: Preemptive SJF
 Average Waiting Time: 5.67
 Average Turnaround Time: 9.00
+CPU Utilization rate: 86.96%
 --------------------------
 Algorithm: Non-preemptive Priority Scheduling
-Average Waiting Time: 8.17
-Average Turnaround Time: 11.50
+Average Waiting Time: 9.33
+Average Turnaround Time: 12.67
 --------------------------
 Algorithm: Preemptive Priority
 Average Waiting Time: 6.33

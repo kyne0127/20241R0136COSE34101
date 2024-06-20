@@ -1,30 +1,30 @@
 #ifndef __SHORTEST__JOB__FIRST__
 #define __SHORTEST__JOB__FIRST__
 
-// Shortest Job First Algorithm
-
 #include "./Process.h"
 #include "./SortingFunction.h"
-#include "./PrintTable.h"
-#include "./PrintGanttChart_nonpreemptive.h"
+#include "./PrintFunction/PrintTable.h"
+#include "./PrintFunction/PrintGanttChart_nonpreemptive_sjf.h"
 
 void sjf_calculate_time(Process *p, int len)
 {
-    int i, j;
-    int curr_time = 0;
+    int i, j, curr_time = 0;
     int min;
     int completed_processes = 0;
+    int io_checker;
 
     while (completed_processes < len)
     {
         min = -1;
-        for (j = 0; j < len; j++)
+        io_checker = 0;
+
+        for (i = 0; i < len; i++)
         {
-            if (p[j].completed == FALSE && p[j].arrive_time <= curr_time)
+            if (p[i].completed == FALSE && p[i].arrive_time <= curr_time)
             {
-                if (min == -1 || p[j].burst < p[min].burst)
+                if (min == -1 || p[i].burst < p[min].burst)
                 {
-                    min = j;
+                    min = i;
                 }
             }
         }
@@ -35,24 +35,28 @@ void sjf_calculate_time(Process *p, int len)
             continue;
         }
 
-        // I/O burst time을 처리
-        if (curr_time >= p[min].io_start_time && curr_time < p[min].io_start_time + p[min].io_duration)
-        {
-            curr_time += (p[min].io_start_time + p[min].io_duration - curr_time);
+        for (j = curr_time; j <= curr_time + p[min].burst; j++) {
+            if (j >= p[min].io_start_time && j < p[min].io_start_time + p[min].io_duration)
+            {
+                io_checker += 1;
+            }
         }
+
+        curr_time += io_checker;
 
         p[min].waiting_time = curr_time - p[min].arrive_time;
         p[min].completed = TRUE;
+        p[min].turnaround_time = p[min].waiting_time + p[min].burst;
+
         curr_time += p[min].burst;
-        p[min].turnaround_time = curr_time - p[min].arrive_time;
-        p[min].end_time = curr_time; // Set the end time
+        p[min].end_time = curr_time;
         completed_processes++;
     }
 }
 
 void sjf_print_gantt_chart(Process *p, int len)
 {
-   print_gantt_chart_nonpreemptive(p, len);
+    print_gantt_chart_nonpreemptive_sjf(p, len);
 }
 
 void SJF(Process *p, int len)
@@ -60,21 +64,23 @@ void SJF(Process *p, int len)
     int i;
     int total_waiting_time = 0;
     int total_turnaround_time = 0;
+    double cpu_utilization = 0;
 
     process_init(p, len);
+
     merge_sort_by_arrive_time(p, 0, len);
 
     sjf_calculate_time(p, len);
 
     for (i = 0; i < len; i++)
     {
-        total_waiting_time += p[i].waiting_time;
         total_turnaround_time += p[i].turnaround_time;
+        total_waiting_time += p[i].waiting_time;
     }
 
-    quick_sort_by_end_time(p, len);
+    printf("\tNon-Preemptive SJF Scheduling Algorithm\n\n");
 
-    printf("\n\tSJF Scheduling Algorithms\n\n");
+    quick_sort_by_end_time(p, len);
 
     sjf_print_gantt_chart(p, len);
 
