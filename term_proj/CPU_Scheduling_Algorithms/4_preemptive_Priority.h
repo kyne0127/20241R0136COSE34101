@@ -4,10 +4,10 @@
 #include "./Process.h"
 #include "./SortingFunction.h"
 #include "./PrintFunction/PrintTable.h"
-#include "./PrintFunction/PrintGanttChart_preemptive_priority.h"
+#include "./PrintFunction/PrintGanttChart_pps.h"
 #include <limits.h>
 
-void pps_calculate_time(Process *p, int len)
+void pps_calculate_time(Process *p, int len, int *idle)
 {
     int i;
     int curr_time = 0;
@@ -56,6 +56,7 @@ void pps_calculate_time(Process *p, int len)
         if (k == -1)
         {
             curr_time++;
+            *idle += 1;
             continue;
         }
 
@@ -99,7 +100,7 @@ void PPS(Process *p, int len)
     process_init(p, len);
 
     merge_sort_by_arrive_time(p, 0, len);
-    pps_calculate_time(p, len);
+    pps_calculate_time(p, len, &idle);
 
     for (i = 0; i < len; i++)
     {
@@ -113,8 +114,13 @@ void PPS(Process *p, int len)
 
     pps_print_gantt_chart(p, len);
 
+    quick_sort_by_end_time(p, len);
+
     printf("\n\tAverage Waiting Time     : %-2.2lf\n", (double)total_waiting_time / (double)len);
     printf("\tAverage Turnaround Time  : %-2.2lf\n", (double)total_turnaround_time / (double)len);
+    cpu_utilization = ((double)(p[len-1].end_time - idle) / (double)p[len-1].end_time) * 100.0;
+    printf("\tCPU Utilization rate     : %-2.2lf%%\n", cpu_utilization);
+    printf("\n");
 
     print_table(p, len);
     FILE *file = fopen("algorithm_comparison.txt", "a");
@@ -127,6 +133,7 @@ void PPS(Process *p, int len)
     fprintf(file, "Algorithm: Preemptive Priority\n");
     fprintf(file, "Average Waiting Time: %.2f\n", (double)total_waiting_time / (double)len);
     fprintf(file, "Average Turnaround Time: %.2f\n", (double)total_turnaround_time / (double)len);
+    fprintf(file, "CPU Utilization rate: %.2f%%\n", cpu_utilization);
     fprintf(file, "--------------------------\n");
 
     fclose(file);

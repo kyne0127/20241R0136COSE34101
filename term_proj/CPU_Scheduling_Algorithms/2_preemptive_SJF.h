@@ -4,14 +4,13 @@
 #include "./Process.h"
 #include "./SortingFunction.h"
 #include "./PrintFunction/PrintTable.h"
-#include "./PrintFunction/PrintGanttChart_preemptive_sjf.h"
+#include "./PrintFunction/PrintGanttChart_psjf.h"
 #include <limits.h>
 
 void psjf_calculate_time(Process *p, int len, int *idle)
 {
     int i;
     int curr_time = 0;
-    int total_burst_time = 0;
     int shortest_remain_time;
     int k = 0;
 
@@ -25,7 +24,6 @@ void psjf_calculate_time(Process *p, int len, int *idle)
     {
         count[i] = 0;
         remain_burst_time[i] = p[i].burst;
-        total_burst_time += p[i].burst;
         p[i].available = TRUE;
     }
 
@@ -114,7 +112,6 @@ void PSJF(Process *p, int len)
     printf("\tPreemptive Shortest Job First Algorithm\n\n");
 
     psjf_print_gantt_chart(p, len);
-    printf("idle tie : %d", idle);
 
     quick_sort_by_end_time(p, len);
 
@@ -122,6 +119,7 @@ void PSJF(Process *p, int len)
     printf("\tAverage Turnaround Time  : %-2.2lf\n", (double)total_turnaround_time / (double)len);
     cpu_utilization = ((double)(p[len-1].end_time - idle) / (double)p[len-1].end_time) * 100.0;
     printf("\tCPU Utilization rate     : %-2.2lf%%\n", cpu_utilization);
+    printf("\n");
 
     print_table(p, len);
     FILE *file = fopen("algorithm_comparison.txt", "a");

@@ -1,6 +1,6 @@
 #include <limits.h>
 
-void print_gantt_chart_fcfs(Process *p, int len)
+void print_gantt_chart_npps(Process *p, int len)
 {
 	int i;
     int curr_time = 0;

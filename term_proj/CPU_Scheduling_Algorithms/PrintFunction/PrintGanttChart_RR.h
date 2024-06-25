@@ -16,7 +16,6 @@ void print_gantt_chart_rr(Process *p, int len, Quantum q)
     for (i = 0; i < len; i++)
     {
         remain_burst_time[i] = p[i].burst;
-        p[i].waiting_time = 0;
         p[i].available = TRUE;
         p[i].completed = FALSE;
     }

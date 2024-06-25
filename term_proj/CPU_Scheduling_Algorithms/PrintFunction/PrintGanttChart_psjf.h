@@ -1,11 +1,11 @@
 #include <limits.h>
 
-void print_gantt_chart_fcfs(Process *p, int len)
+void print_gantt_chart_psjf(Process *p, int len)
 {
 	int i;
     int curr_time = 0;
     int k = -1, pre_k = -1;
-    int highest_priority;
+    int shortest_remain_time;
 
     int *remain_burst_time = (int *)malloc(sizeof(int) * len);
 	int *count = (int *)malloc(sizeof(int) * len);
@@ -24,7 +24,7 @@ void print_gantt_chart_fcfs(Process *p, int len)
 
     while (flag)
     {
-        highest_priority = INT_MAX;
+        shortest_remain_time = INT_MAX;
         k = -1;
 
         for (i = 0; i < len; i++)
@@ -41,11 +41,9 @@ void print_gantt_chart_fcfs(Process *p, int len)
 
         for (i = 0; i < len; i++)
         {
-            if ((p[i].completed == FALSE && p[i].available == TRUE)
-                && (p[i].arrive_time <= curr_time)
-                && (highest_priority > p[i].priority))
+            if (p[i].completed == FALSE && p[i].arrive_time <= curr_time && remain_burst_time[i] < shortest_remain_time && p[i].available == TRUE)
             {
-                highest_priority = p[i].priority;
+                shortest_remain_time = remain_burst_time[i];
                 k = i;
 				idle += 1;
             }
@@ -104,7 +102,7 @@ void print_gantt_chart_fcfs(Process *p, int len)
 
 	while (flag)
     {
-        highest_priority = INT_MAX;
+        shortest_remain_time = INT_MAX;
         k = -1;
 
         for (i = 0; i < len; i++)
@@ -121,11 +119,9 @@ void print_gantt_chart_fcfs(Process *p, int len)
 
         for (i = 0; i < len; i++)
         {
-            if ((p[i].completed == FALSE && p[i].available == TRUE)
-                && (p[i].arrive_time <= curr_time)
-                && (highest_priority > p[i].priority))
+            if (p[i].completed == FALSE && p[i].arrive_time <= curr_time && remain_burst_time[i] < shortest_remain_time && p[i].available == TRUE)
             {
-                highest_priority = p[i].priority;
+                shortest_remain_time = remain_burst_time[i];
                 k = i;
 				idle += 1;
             }
@@ -198,7 +194,7 @@ void print_gantt_chart_fcfs(Process *p, int len)
 
     while (flag)
     {
-        highest_priority = INT_MAX;
+        shortest_remain_time = INT_MAX;
         k = -1;
 
         for (i = 0; i < len; i++)
@@ -215,11 +211,9 @@ void print_gantt_chart_fcfs(Process *p, int len)
 
         for (i = 0; i < len; i++)
         {
-            if ((p[i].completed == FALSE && p[i].available == TRUE)
-                && (p[i].arrive_time <= curr_time)
-                && (highest_priority > p[i].priority))
+            if (p[i].completed == FALSE && p[i].arrive_time <= curr_time && remain_burst_time[i] < shortest_remain_time && p[i].available == TRUE)
             {
-                highest_priority = p[i].priority;
+                shortest_remain_time = remain_burst_time[i];
                 k = i;
 				idle += 1;
             }
@@ -280,7 +274,7 @@ void print_gantt_chart_fcfs(Process *p, int len)
 
 	while (flag)
     {
-        highest_priority = INT_MAX;
+        shortest_remain_time = INT_MAX;
         k = -1;
 
         for (i = 0; i < len; i++)
@@ -297,11 +291,9 @@ void print_gantt_chart_fcfs(Process *p, int len)
 
         for (i = 0; i < len; i++)
         {
-            if ((p[i].completed == FALSE && p[i].available == TRUE)
-                && (p[i].arrive_time <= curr_time)
-                && (highest_priority > p[i].priority))
+            if (p[i].completed == FALSE && p[i].arrive_time <= curr_time && remain_burst_time[i] < shortest_remain_time && p[i].available == TRUE)
             {
-                highest_priority = p[i].priority;
+                shortest_remain_time = remain_burst_time[i];
                 k = i;
             }
             idle += 1;
